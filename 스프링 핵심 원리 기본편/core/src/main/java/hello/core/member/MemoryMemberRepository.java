@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component //memoryMemberRepository (컴포넌트 맨앞 소문자로 바뀜)
+//@Component //memoryMemberRepository (컴포넌트 맨앞 소문자로 바뀜)
 public class MemoryMemberRepository implements MemberRepository {
 
     private static Map<Long, Member> store = new HashMap<>();
