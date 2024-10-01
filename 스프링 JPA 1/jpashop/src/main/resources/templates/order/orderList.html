@@ -47,8 +47,7 @@
                 <td th:text="${item.orderDate}"></td>
                 <td>
                     <a th:if="${item.status.name() == 'ORDER'}" href="#"
-                       th:href="'javascript:cancel('+${item.id}+')'"
-                       class="btn btn-danger">CANCEL</a>
+                       th:href="'javascript:cancel('+${item.id}+')'" class="btn btn-danger">CANCEL</a>
                 </td>
             </tr>
             </tbody>
