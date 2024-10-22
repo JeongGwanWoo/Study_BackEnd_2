@@ -35,6 +35,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 //        super.doFilterInternal(request, response, chain);
         System.out.println("인증이나 권한이 필요한 주소 요청이 됨.");
 
+        if (request.getRequestURI().equals("/home")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String jwtHeader = request.getHeader(JwtProperties.HEADER_STRING);
         System.out.println("jwtHeader = " + jwtHeader);
 
