@@ -21,6 +21,6 @@ public class ViewController {
     @GetMapping("/home")
     public String home() {
         System.out.println("/home 호출 완료 @@@@@");
-        return "index";
+        return "api/home";
     }
 }

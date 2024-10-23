@@ -10,6 +10,7 @@ import enerhi.jwt.config.repository.UserRepository;
 import enerhi.jwt.model.LoginResponse;
 import enerhi.jwt.model.User;
 import enerhi.jwt.model.UserLoginRequest;
+import enerhi.jwt.model.UserProfile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,21 +39,20 @@ public class RestApiController {
 
     @PostMapping("login")
     public ResponseEntity<LoginResponse> login(@RequestBody UserLoginRequest userLoginRequest) {
-        System.out.println("JwtAuthenticationFilter: 로그인 시도중@@@@@@@@@@@@@@@@");
+        System.out.println("로그인 시도중@@@@@@@@@@@@@@@@");
 
-        // 1. username, password 받아서
         try {
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(userLoginRequest.getUsername(), userLoginRequest.getPassword());
 
-            // PrincipalDetailsService의 loadUserByUsername() 함수가 실행된 후 정상이면 authentication이 리턴됨.
-            // DB에 있는 username과 password가 일치한다.
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
             PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
             System.out.println("로그인 완료됨: " + principalDetails.getUser().getUsername()); // 로그인 정상적으로 되었다는 뜻.
 
-            LoginResponse loginResponse = new LoginResponse(true, createJwtToken(authentication));
+            String jwtToken = createJwtToken(authentication);
+            LoginResponse loginResponse = new LoginResponse(true, jwtToken);
+            System.out.println("jwtToken = Bearer " + jwtToken);
             return ResponseEntity.ok(loginResponse);
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponse(false, "Invalid credentials"));
@@ -77,10 +77,23 @@ public class RestApiController {
         return "회원가입완료";
     }
 
+    @GetMapping("/api/v1/user/info")
+    public ResponseEntity<?> userProfile(Authentication authentication) {
+        System.out.println("사용자 정보 호출 완료");
+        // 로그인한 사용자 정보 가져오기 (PrincipalDetails 같은 인증 객체에서 가져올 수 있음)
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+
+        // 사용자 정보 생성
+        UserProfile profile = new UserProfile();
+
+        profile.setUsername(principalDetails.getUsername());
+
+        return ResponseEntity.ok(profile);
+    }
+
     @GetMapping("api/v1/user")
-    public ResponseEntity<String> user() {
-        System.out.println("user 접근 진행중!!!!!!!!!!!!!!!!!!");
-        return ResponseEntity.ok("<h1>user</h1>");
+    public String user() {
+        return "<h1>user</h1>";
     }
 
     // manager, admin 권한만 접근 가능
@@ -89,7 +102,7 @@ public class RestApiController {
         return "<h1>manager</h1>";
     }
 
-    // admin 권하만 접근 가능
+    // admin 권한만 접근 가능
     @GetMapping("api/v1/admin")
     public String admin() {
         return "<h1>admin</h1>";
